@@ -21,7 +21,7 @@
 
 #define KEYBOARD_HEIGHT 80
 #define PREDICTION_BAR_HEIGHT 40
-#define ADD_BUTTON_PADDING 10.0f
+#define ADD_BUTTON_PADDING 15.0f
 #define DEFAULT_WINDOW_WIDTH 240
 
 @interface SCLAlertView ()  <UITextFieldDelegate, UIGestureRecognizerDelegate>
@@ -155,11 +155,8 @@ SCLTimerDisplay *buttonTimer;
     kActivityIndicatorHeight = 40.0f;
     kTitleTop = 24.0f;
     kTitleHeight = 40.0f;
-    self.subTitleY = 70.0f;
-    self.subTitleHeight = 90.0f;
     self.circleIconHeight = 20.0f;
     self.windowWidth = windowWidth;
-    self.windowHeight = 178.0f;
     self.shouldDismissOnTapOutside = NO;
     self.usingNewWindow = NO;
     self.canAddObservers = YES;
@@ -196,7 +193,7 @@ SCLTimerDisplay *buttonTimer;
     
     // Content View
     _contentView.backgroundColor = [UIColor whiteColor];
-    _contentView.layer.cornerRadius = 5.0f;
+    _contentView.layer.cornerRadius = 14.0f;
     _contentView.layer.masksToBounds = YES;
     _contentView.layer.borderWidth = 0.5f;
     [_contentView addSubview:_labelTitle];
@@ -214,10 +211,9 @@ SCLTimerDisplay *buttonTimer;
     [_circleView addSubview:_circleIconImageView];
     
     // Title
-    _labelTitle.numberOfLines = 1;
+    _labelTitle.numberOfLines = 0;
     _labelTitle.textAlignment = NSTextAlignmentCenter;
     _labelTitle.font = [UIFont fontWithName:_titleFontFamily size:_titleFontSize];
-    _labelTitle.frame = CGRectMake(12.0f, kTitleTop, _windowWidth - 24.0f, kTitleHeight);
     
     // View text
     _viewText.editable = NO;
@@ -264,6 +260,42 @@ SCLTimerDisplay *buttonTimer;
 - (void)viewWillLayoutSubviews
 {
     [super viewWillLayoutSubviews];
+    
+    CGFloat textWidth = _windowWidth - 24.0f;
+    CGSize size = [_labelTitle sizeThatFits:CGSizeMake(textWidth, DBL_MAX)];
+    _labelTitle.frame = CGRectMake(12.0f, kTitleTop, textWidth, size.height + 32);
+    _subTitleY = _labelTitle.window != nil ? CGRectGetMaxY(_labelTitle.frame) : kCircleHeight - 20;
+
+    _subTitleHeight = [_viewText sizeThatFits:CGSizeMake(textWidth, DBL_MAX)].height;
+    _viewText.frame = CGRectMake(12.0f, _subTitleY, textWidth, _subTitleHeight);
+    
+    {
+        // Text fields
+        CGFloat y = _subTitleY;
+        y += _subTitleHeight + 16.0f;
+        for (SCLTextView *textField in _inputs)
+        {
+            textField.frame = CGRectMake(12.0f, y, _windowWidth - 24.0f, textField.frame.size.height);
+            textField.layer.cornerRadius = 3.0f;
+            y += textField.frame.size.height + 10.0f;
+        }
+        
+        // Buttons
+        for (SCLButton *btn in _buttons)
+        {
+            btn.frame = CGRectMake(btn.frame.origin.x, y, btn.frame.size.width, btn.frame.size.height);
+            btn.layer.cornerRadius = 6.0f;
+            y += btn.frame.size.height + 10.0f;
+        }
+        
+        SCLButton *lastButton = _buttons.lastObject;
+        if (lastButton.backgroundColor != [UIColor clearColor]) {
+            _windowHeight = y + 5;
+        }
+        else {
+            _windowHeight = y;
+        }
+    }
     
     CGSize sz = [self mainScreenFrame].size;
     
@@ -319,26 +351,6 @@ SCLTimerDisplay *buttonTimer;
         x = (sz.width - kCircleHeightBackground) / 2;
         _circleViewBackground.frame = CGRectMake(x, y, kCircleHeightBackground, kCircleHeightBackground);
         _circleIconImageView.frame = CGRectMake(kCircleHeight / 2 - _circleIconHeight / 2, kCircleHeight / 2 - _circleIconHeight / 2, _circleIconHeight, _circleIconHeight);
-    }
-    
-    {
-        // Text fields
-        CGFloat y = (_labelTitle.text == nil) ? (kCircleHeight - 20.0f) : 74.0f;
-        y += _subTitleHeight + 14.0f;
-        for (SCLTextView *textField in _inputs)
-        {
-            textField.frame = CGRectMake(12.0f, y, _windowWidth - 24.0f, textField.frame.size.height);
-            textField.layer.cornerRadius = 3.0f;
-            y += textField.frame.size.height + 10.0f;
-        }
-        
-        // Buttons
-        for (SCLButton *btn in _buttons)
-        {
-            btn.frame = CGRectMake(12.0f, y, btn.frame.size.width, btn.frame.size.height);
-            btn.layer.cornerRadius = 3.0f;
-            y += btn.frame.size.height + 10.0f;
-        }
     }
 }
 
@@ -792,8 +804,6 @@ SCLTimerDisplay *buttonTimer;
         // Title is nil, we can move the body message to center and remove it from superView
         self.windowHeight -= _labelTitle.frame.size.height;
         [_labelTitle removeFromSuperview];
-        
-        _subTitleY = kCircleHeight - 20;
     }
     
     // Subtitle
@@ -826,7 +836,7 @@ SCLTimerDisplay *buttonTimer;
             self.windowHeight += (ht - _subTitleHeight);
             self.subTitleHeight = ht;
         }
-        _viewText.frame = CGRectMake(12.0f, _subTitleY, _windowWidth - 24.0f, _subTitleHeight);
+        _viewText.frame = CGRectMake(28.0f, _subTitleY, _windowWidth - 2 * 28.0f, _subTitleHeight);
     }
     else
     {

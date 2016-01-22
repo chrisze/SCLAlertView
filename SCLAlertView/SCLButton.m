@@ -9,9 +9,9 @@
 #import "SCLButton.h"
 #import "SCLTimerDisplay.h"
 
-#define MARGIN_BUTTON 12.0f
-#define DEFAULT_WINDOW_WIDTH 240
-#define MIN_HEIGHT 35.0f
+#define MARGIN_BUTTON 16.0f
+#define DEFAULT_WINDOW_WIDTH 280
+#define MIN_HEIGHT 40.0f
 
 @implementation SCLButton
 
@@ -57,7 +57,7 @@
 
 - (void)setupWithWindowWidth:(CGFloat)windowWidth
 {
-    self.frame = CGRectMake(0.0f, 0.0f, windowWidth - (MARGIN_BUTTON * 2), MIN_HEIGHT);
+    self.frame = CGRectMake(MARGIN_BUTTON, 0.0f, windowWidth - (MARGIN_BUTTON * 2), MIN_HEIGHT);
     self.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
 }
