@@ -880,7 +880,6 @@ SCLTimerDisplay *buttonTimer;
     {
         if (self.iconTintColor) {
             self.circleIconImageView.tintColor = self.iconTintColor;
-            iconImage  = [iconImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
         }
         self.circleIconImageView.image = iconImage;
     }
